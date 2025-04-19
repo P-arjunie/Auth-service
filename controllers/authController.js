@@ -3,25 +3,58 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 
-//register user 
+// //register user 
+// exports.register = async (req, res) => {
+//     const {email, password, role} = req.body;
+//     try{
+//         //check whether the user already registred
+//         const exisitingUser = await User.findOne({email});
+//         if(exisitingUser)
+//             return res.status(400).json({message: 'User already exists'});
+
+//         //hash the pwd
+//         const hashPassword = await bcrypt.hash(password, 10);
+//         const newUser = new User ({email, password: hashPassword, role});
+//         await newUser.save();
+
+//         res.status(201).json({message: 'User registered successfully'});
+//     }catch (err){
+//         res.status(500).json({message: 'Server error', error: err.message});
+//     }
+// }
+// auth/controllers/authController.js
+
 exports.register = async (req, res) => {
-    const {email, password, role} = req.body;
-    try{
-        //check whether the user already registred
-        const exisitingUser = await User.findOne({email});
-        if(exisitingUser)
-            return res.status(400).json({message: 'User already exists'});
+  try {
+    console.log('Incoming Register Request:', req.body);
 
-        //hash the pwd
-        const hashPassword = await bcrypt.hash(password, 10);
-        const newUser = new User ({email, password: hashPassword, role});
-        await newUser.save();
+    const { email, password, role } = req.body;
 
-        res.status(201).json({message: 'User registered successfully'});
-    }catch (err){
-        res.status(500).json({message: 'Server error', error: err.message});
+    if (!email || !password || !role) {
+      return res.status(400).json({ message: 'All fields are required' });
     }
-}
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: 'Email already registered' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    await newUser.save();
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (err) {
+    console.error('Auth Service Error:', err.message);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
 
 
 //login user
