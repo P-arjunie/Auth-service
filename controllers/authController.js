@@ -57,27 +57,38 @@ exports.register = async (req, res) => {
 };
 
 
-//login user
-exports.login = async(req, res) => {
-    const {email, password} = req.body;
-    try{
-        //find user thorugh email
-        const user = await User.findOne({email});
-        if(!user)
-            return res.status(400).json({message: 'User not found'});
+// login user
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if(!isMatch)
-            return res.status(400).json({message: 'Invalid credentials'});
+  try {
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user)
+      return res.status(400).json({ message: 'User not found' });
 
-        //create token
-        const token = jwt.sign({userId: user._id, role: user.role}, 
-            process.env.JWT_SECRET, {
-                expiresIn: '1d',
-        });
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch)
+      return res.status(400).json({ message: 'Invalid credentials' });
 
-        res.status(200).json({token});
-    }catch (err) {
-        res.status(500).json({message: 'Server error', error: err.message});
-    }
+    // Create token
+    const token = jwt.sign(
+      { userId: user._id, role: user.role, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    // Respond with token and user info
+    res.status(200).json({
+      token,
+      user: {
+        email: user.email,
+        role: user.role
+      }
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
 };
