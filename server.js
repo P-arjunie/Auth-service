@@ -6,6 +6,12 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ✅ Apply CORS first
+app.use(cors({
+    origin: 'http://localhost:5173', // or allow multiple origins if needed
+    credentials: true
+}));
+
 //routes
 const authRoutes = require('./routes/authRoutes');
 
