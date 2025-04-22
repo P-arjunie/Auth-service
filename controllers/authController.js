@@ -2,28 +2,6 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-
-// //register user 
-// exports.register = async (req, res) => {
-//     const {email, password, role} = req.body;
-//     try{
-//         //check whether the user already registred
-//         const exisitingUser = await User.findOne({email});
-//         if(exisitingUser)
-//             return res.status(400).json({message: 'User already exists'});
-
-//         //hash the pwd
-//         const hashPassword = await bcrypt.hash(password, 10);
-//         const newUser = new User ({email, password: hashPassword, role});
-//         await newUser.save();
-
-//         res.status(201).json({message: 'User registered successfully'});
-//     }catch (err){
-//         res.status(500).json({message: 'Server error', error: err.message});
-//     }
-// }
-// auth/controllers/authController.js
-
 exports.register = async (req, res) => {
   try {
     console.log('Incoming Register Request:', req.body);
@@ -89,6 +67,23 @@ exports.login = async (req, res) => {
     });
 
   } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+
+// Verify token endpoint
+exports.verifyToken = async (req, res) => {
+  try {
+    // The auth middleware has already verified the token and added the decoded user to req.user
+    // Just return the user information
+    return res.status(200).json({
+      userId: req.user.userId,
+      email: req.user.email,
+      role: req.user.role
+    });
+  } catch (err) {
+    console.error('Token verification error:', err.message);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
