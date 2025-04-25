@@ -8,9 +8,10 @@ const PORT = process.env.PORT || 5000;
 
 // ✅ Apply CORS first
 app.use(cors({
-    origin: 'https://ds-frontend-taupe.vercel.app', // or allow multiple origins if needed
-    credentials: true
-}));
+    origin: '*',
+    credentials: false // Credentials can't be used with wildcard origin
+  }));
+  
 
 //routes
 const authRoutes = require('./routes/authRoutes');
