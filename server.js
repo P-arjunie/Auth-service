@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5000;
 
 // ✅ Apply CORS first
 app.use(cors({
-    origin: 'http://localhost:5173', // or allow multiple origins if needed
+    origin: 'https://ds-frontend-taupe.vercel.app', // or allow multiple origins if needed
     credentials: true
 }));
 
